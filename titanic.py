@@ -46,6 +46,6 @@ df = titanic.copy()
 # Selectbox
 a = st.selectbox('Selecciona el número de filas para visualizar',options=('5', '20', '50'))
 
-st.write(df.head(a))
+st.write(df.head(int(a)))
 
 df['Embarked'].fillna(df['Embarked'].mode()[0], inplace=True)
