@@ -5,7 +5,7 @@ import numpy as np
 # Visualización
 import matplotlib.pyplot as plt
 import seaborn as sns
-# import sklearn
+import sklearn
 # Modelos
 # from sklearn.model_selection import train_test_split, cross_val_score, cross_validate
 # from sklearn.preprocessing import OneHotEncoder, StandardScaler, LabelEncoder, MinMaxScaler
