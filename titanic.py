@@ -28,8 +28,8 @@ st.title('El Titanic')
 
 from PIL import Image
 
-# image = Image.open('Teoria/img/titanic.jpeg')
-# st.image(image)
+image = Image.open('Teoria/img/titanic.jpeg')
+st.image(image)
 
 st.subheader('Ejemplo de pasajeros del Titanic')
 URL = 'https://raw.githubusercontent.com/datasciencedojo/datasets/master/titanic.csv'
