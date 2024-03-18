@@ -31,7 +31,11 @@ from PIL import Image
 image = Image.open('titanic.jpeg')
 st.image(image)
 
-st.info("El RMS Titanic fue un transatlántico británico, el mayor barco de pasajeros del mundo al finalizar su construcción, que naufragó en las aguas del océano Atlántico durante la noche del 14 y la madrugada del 15 de abril de 1912, mientras realizaba su viaje inaugural desde Southampton a Nueva York, tras chocar con un iceberg. En el hundimiento murieron 1496 personas de las 2208 que iban a bordo, lo que convierte a esta catástrofe en uno de los naufragios más mortales de la historia ocurridos en tiempos de paz.", icon="i")
+st.info("El RMS Titanic fue un transatlántico británico, el mayor barco de pasajeros del mundo al finalizar su construcción, \
+    que naufragó en las aguas del océano Atlántico durante la noche del 14 y la madrugada del 15 de abril de 1912,\
+        mientras realizaba su viaje inaugural desde Southampton a Nueva York, tras chocar con un iceberg. \
+            En el hundimiento murieron 1496 personas de las 2208 que iban a bordo, lo que convierte a esta catástrofe en uno de los naufragios más mortales \
+                de la historia ocurridos en tiempos de paz.", icon="ℹ️")
 
 st.subheader('Ejemplo de pasajeros del Titanic')
 URL = 'https://raw.githubusercontent.com/datasciencedojo/datasets/master/titanic.csv'
