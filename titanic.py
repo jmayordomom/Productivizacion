@@ -28,7 +28,7 @@ st.title('El Titanic')
 
 from PIL import Image
 
-image = Image.open('Teoria/img/titanic.jpeg')
+image = Image.open('titanic.jpeg')
 st.image(image)
 
 st.subheader('Ejemplo de pasajeros del Titanic')
