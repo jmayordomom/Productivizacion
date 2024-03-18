@@ -42,4 +42,10 @@ URL = 'https://raw.githubusercontent.com/datasciencedojo/datasets/master/titanic
 titanic = pd.read_csv(URL, index_col='PassengerId')
 
 df = titanic.copy()
-st.write(df.head())
+
+# Selectbox
+a = st.selectbox('Selecciona el número de filas para visualizar',options=('5', '20', '50'))
+
+st.write(df.head(a))
+
+df['Embarked'].fillna(df['Embarked'].mode()[0], inplace=True)
