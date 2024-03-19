@@ -162,4 +162,4 @@ st.subheader('Tras realizar el CV, nos aparecen los siguientes valores para los 
 
 st.write(res)
 
-st.subheader('Como se puede ver, el mejor es ' + res[0][0])
+st.subheader('Como se puede ver, el mejor es ' + res[0])
