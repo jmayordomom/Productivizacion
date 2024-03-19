@@ -54,6 +54,7 @@ a = st.selectbox('Selecciona el número de filas para visualizar',options=('5', 
 st.write(df.head(int(a)))
 
 #Limpieza de datos
+df.drop(columns=['Ticket', 'Cabin'], inplace=True)
 df['Embarked'].fillna(df['Embarked'].mode()[0], inplace=True)
 
 #Feature Engineering
