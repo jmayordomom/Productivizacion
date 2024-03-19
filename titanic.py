@@ -1,4 +1,4 @@
-# Tratamiento de datos
+# Imports
 import re
 import pandas as pd
 import numpy as np
@@ -7,23 +7,31 @@ import numpy as np
 # import seaborn as sns
 # import sklearn
 # Modelos
-# from sklearn.model_selection import train_test_split, cross_val_score, cross_validate
-# from sklearn.preprocessing import OneHotEncoder, StandardScaler, LabelEncoder, MinMaxScaler
-# from sklearn.compose import ColumnTransformer
-# from sklearn.pipeline import make_pipeline
-# from sklearn.linear_model import LogisticRegression
-# from sklearn.model_selection import GridSearchCV
-# from sklearn.svm import SVC
-# from sklearn.tree import DecisionTreeClassifier
-# from xgboost import XGBClassifier
-# from catboost import CatBoostClassifier
-# from sklearn.ensemble import RandomForestClassifier, VotingClassifier, BaggingClassifier
-# from sklearn.metrics import confusion_matrix, classification_report, accuracy_score, f1_score, precision_score, recall_score, \
-# roc_curve, roc_auc_score, ConfusionMatrixDisplay, multilabel_confusion_matrix
+from sklearn.model_selection import train_test_split, cross_val_score, cross_validate
+from sklearn.preprocessing import OneHotEncoder, StandardScaler, LabelEncoder, MinMaxScaler
+from sklearn.compose import ColumnTransformer
+from sklearn.pipeline import make_pipeline
+from sklearn.linear_model import LogisticRegression
+from sklearn.model_selection import GridSearchCV
+from sklearn.svm import SVC
+from sklearn.tree import DecisionTreeClassifier
+from xgboost import XGBClassifier
+from catboost import CatBoostClassifier
+from sklearn.ensemble import RandomForestClassifier, VotingClassifier, BaggingClassifier
+from sklearn.metrics import confusion_matrix, classification_report, accuracy_score, f1_score, precision_score, recall_score, \
+roc_curve, roc_auc_score, ConfusionMatrixDisplay, multilabel_confusion_matrix
 import streamlit as st
 import os
 
-print(os.getcwd())
+#Funciones
+def clasificar_nombre(nombre):
+    if ', Master.' in nombre:
+        return 'kids'
+    elif ', Miss.' in nombre:
+        return 'miss'
+    else:
+        return 'adults'
+    
 st.title('El Titanic')
 
 from PIL import Image
@@ -38,6 +46,8 @@ st.info("El RMS Titanic fue un transatlántico británico, el mayor barco de pas
                 de la historia ocurridos en tiempos de paz.", icon="ℹ️")
 
 st.subheader('Ejemplo de pasajeros del Titanic')
+
+#Carga de datos
 URL = 'https://raw.githubusercontent.com/datasciencedojo/datasets/master/titanic.csv'
 titanic = pd.read_csv(URL, index_col='PassengerId')
 
@@ -48,4 +58,101 @@ a = st.selectbox('Selecciona el número de filas para visualizar',options=('5', 
 
 st.write(df.head(int(a)))
 
+#Limpieza de datos
 df['Embarked'].fillna(df['Embarked'].mode()[0], inplace=True)
+
+#Feature Engineering
+df["Acompaniantes"] = df["SibSp"] + df["Parch"]
+df['Acompaniantes'] = np.where(df['Acompaniantes'] > 0, 1, 0)
+df.drop(columns=["SibSp", "Parch"], inplace=True)
+
+
+df['Rango_edad'] = df['Name'].apply(clasificar_nombre)
+
+mean_male = df[df['Sex'] == 'male']['Age'].mean()
+mean_female = df[df['Sex'] == 'female']['Age'].mean()
+mean_kids = df[df['Rango_edad'] == 'kids']['Age'].mean()
+mean_miss = df[df['Rango_edad'] == 'miss']['Age'].mean()
+
+is_male = df['Sex'] == 'male'
+is_female = df['Sex'] == 'female'
+is_kids = df['Rango_edad'] == 'kids'
+is_miss = df['Rango_edad'] == 'miss'
+
+is_nan = df['Age'].isna()
+
+df.loc[is_male & is_nan, 'Age'] = mean_male
+df.loc[is_female & is_nan, 'Age'] = mean_female
+df.loc[is_kids & is_nan, 'Age'] = mean_kids
+df.loc[is_miss & is_nan, 'Age'] = mean_miss
+
+df.drop(columns=['Rango_edad','Name'], inplace=True)
+
+df['Sex'].replace(['male', 'female'], [1, 0], inplace=True)
+df.rename(columns={'Sex':'is_male'}, inplace=True)
+
+# División de datos
+X_train, X_test, y_train, y_test = train_test_split(df.drop(columns=['Survived']), df['Survived'], test_size=0.2, random_state=73)
+
+# Escalado y dummies
+X_train['Fare'] = np.log(X_train['Fare']+1)
+X_test['Fare'] = np.log(X_test['Fare']+1)
+
+esc = MinMaxScaler()
+X_train[['Age', 'Fare']] = esc.fit_transform(X_train[['Age', 'Fare']])
+X_test[['Age', 'Fare']] = esc.transform(X_test[['Age', 'Fare']])
+
+map_embarke = {"S":0, "C":1, "Q":2}
+X_train["Embarked"] = X_train["Embarked"].replace(map_embarke)
+X_test["Embarked"] = X_test["Embarked"].replace(map_embarke)
+
+# Cross Validation + BaseLines
+modelos = {
+    "Logistic Regression": LogisticRegression(),
+    "Decision Tree": DecisionTreeClassifier(),
+    "RandomForestClassifier": RandomForestClassifier(),
+    "XGBoost": XGBClassifier(),
+    "CatBoost": CatBoostClassifier(verbose=False)
+    
+}
+
+metricas = ["accuracy", "f1_macro", "recall_macro", "precision_macro", "roc_auc_ovr"]
+
+resultados_dict = {}
+
+for nombre_modelo, modelo in modelos.items():
+    cv_resultados = cross_validate(modelo, X_train, y_train, cv=5, scoring=metricas)
+    
+    for metrica in metricas:
+        clave = f"{nombre_modelo}_{metrica}"
+        resultados_dict[clave] = cv_resultados[f"test_{metrica}"].mean()
+
+resultados_df = pd.DataFrame([resultados_dict])
+
+resultados_df.T.sort_values(by=0, ascending=False)
+
+#Entrenar
+catb = CatBoostClassifier(verbose=False)
+catb.fit(X_train, y_train)
+
+# Prediccion
+y_pred = catb.predict(X_test)
+
+# Validación del modelo
+print(classification_report(y_test, y_pred))
+
+# Optimización del modelo
+param_grid = {
+    'depth': [6, 8, 10],
+    'learning_rate': [0.01, 0.05, 0.1],
+    'iterations': [30, 50, 100]
+}
+catb = CatBoostClassifier(verbose=False)
+
+grid_search = GridSearchCV(estimator=catb, param_grid=param_grid, cv=3, scoring='accuracy')
+
+grid_search.fit(X_train, y_train)
+
+best_parameters = grid_search.best_params_
+best_model = grid_search.best_estimator_
+
