@@ -105,7 +105,7 @@ for nombre_modelo, modelo in modelos.items():
 
 resultados_df = pd.DataFrame([resultados_dict])
 
-resultados_df.T.sort_values(by=0, ascending=False)
+res = resultados_df.T.sort_values(by=0, ascending=False)
 
 #Entrenar
 catb = CatBoostClassifier(verbose=False)
@@ -145,6 +145,8 @@ st.info("El RMS Titanic fue un transatlántico británico, el mayor barco de pas
             En el hundimiento murieron 1496 personas de las 2208 que iban a bordo, lo que convierte a esta catástrofe en uno de los naufragios más mortales \
                 de la historia ocurridos en tiempos de paz.", icon="ℹ️")
 
+st.subheader('Vamos a intentar predecir si un pasajero sobrevivió o no')
+
 st.subheader('Ejemplo de pasajeros del Titanic')
 
 # Selectbox
@@ -155,3 +157,9 @@ st.write(df.head(int(a)))
 st.subheader('Tras la limpieza de datos y preparación del dataset, queda el siguiente dataset de entrenamiento')
 
 st.write(X_train)
+
+st.subheader('Tras realizar el CV, nos aparecen los siguientes valores para los modelos y métricas usados')
+
+st.write(res)
+
+st.subheader('Como se puede ver, el mejor es ' + res[0][0])
