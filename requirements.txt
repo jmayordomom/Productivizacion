@@ -1,6 +1,5 @@
 scikit-learn
 statsmodels
-torch
-torchvision
-torchaudio
-tensorflow
+catboost
+streamlit
+xgboost
