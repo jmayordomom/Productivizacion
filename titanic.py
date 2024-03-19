@@ -27,31 +27,11 @@ def clasificar_nombre(nombre):
     else:
         return 'adults'
     
-st.title('El Titanic')
-
-from PIL import Image
-
-image = Image.open('titanic.jpeg')
-st.image(image)
-
-st.info("El RMS Titanic fue un transatlántico británico, el mayor barco de pasajeros del mundo al finalizar su construcción, \
-    que naufragó en las aguas del océano Atlántico durante la noche del 14 y la madrugada del 15 de abril de 1912,\
-        mientras realizaba su viaje inaugural desde Southampton a Nueva York, tras chocar con un iceberg. \
-            En el hundimiento murieron 1496 personas de las 2208 que iban a bordo, lo que convierte a esta catástrofe en uno de los naufragios más mortales \
-                de la historia ocurridos en tiempos de paz.", icon="ℹ️")
-
-st.subheader('Ejemplo de pasajeros del Titanic')
-
 #Carga de datos
 URL = 'https://raw.githubusercontent.com/datasciencedojo/datasets/master/titanic.csv'
 titanic = pd.read_csv(URL, index_col='PassengerId')
 
 df = titanic.copy()
-
-# Selectbox
-a = st.selectbox('Selecciona el número de filas para visualizar',options=('5', '20', '50'))
-
-st.write(df.head(int(a)))
 
 #Limpieza de datos
 df.drop(columns=['Ticket', 'Cabin'], inplace=True)
@@ -152,3 +132,26 @@ grid_search.fit(X_train, y_train)
 best_parameters = grid_search.best_params_
 best_model = grid_search.best_estimator_
 
+st.title('El Titanic')
+
+from PIL import Image
+
+image = Image.open('titanic.jpeg')
+st.image(image)
+
+st.info("El RMS Titanic fue un transatlántico británico, el mayor barco de pasajeros del mundo al finalizar su construcción, \
+    que naufragó en las aguas del océano Atlántico durante la noche del 14 y la madrugada del 15 de abril de 1912,\
+        mientras realizaba su viaje inaugural desde Southampton a Nueva York, tras chocar con un iceberg. \
+            En el hundimiento murieron 1496 personas de las 2208 que iban a bordo, lo que convierte a esta catástrofe en uno de los naufragios más mortales \
+                de la historia ocurridos en tiempos de paz.", icon="ℹ️")
+
+st.subheader('Ejemplo de pasajeros del Titanic')
+
+# Selectbox
+a = st.selectbox('Selecciona el número de filas para visualizar del lote inicial',options=('5', '20', '50'))
+
+st.write(df.head(int(a)))
+
+st.subheader('Tras la limpieza de datos y preparación del dataset, queda el siguiente dataset de entrenamiento')
+
+st.write(X_train)
